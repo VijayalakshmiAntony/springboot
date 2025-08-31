@@ -1,0 +1,59 @@
+server:
+  port: 8083
+
+spring:
+    application:
+        name: studentms
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: test
+        url: jdbc:mysql://mysql8:3306/Microservice
+        username: root
+    jpa:
+        hibernate:
+            naming:
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL8Dialect
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://z1:8761/eureka, http://z2:8762/eureka, http://z3:8763/eureka
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://LAPTOP-KII1SFLO:8761/eureka/
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 8
+        permittedNumberOfCallsInHalfOpenState: 2
+        slidingWindowType: COUNT_BASED
+        waitDurationInOpenState: 30
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 4
+    instances:
+      studentclientms:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransferFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 20s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
